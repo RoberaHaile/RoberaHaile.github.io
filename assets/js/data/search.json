@@ -1,0 +1,19 @@
+[
+  
+  {
+    "title": "WinMemFopen: opening memory streams as regular files in Windows",
+    "url": "/posts/winmemfopen-a-tool-for-windows/",
+    "categories": "",
+    "tags": "Red teaming, programming, evasion",
+    "date": "2021-06-12 18:02:41 +0300",
+    
+
+
+
+
+
+    "snippet": "Opening memory streams as regular files on WindowsOne of my personal projects at a point was developing fully undetectable (FUD) malware in Windows environments. Now, there are a lot of elements and components we have to work on to make our implants FUD, but they are out of scope of this blog. He..."
+  }
+  
+]
+
