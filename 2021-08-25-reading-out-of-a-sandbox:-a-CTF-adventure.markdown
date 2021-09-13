@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "reading out of a sandbox: a CTF adventure" 
+title:  "Reading out of a sandbox: a CTF adventure" 
 date:	2021-08-25 13:20:21 +0300
 tags: [pwn, Linux, syscalls, sandbox]
 ---
