@@ -24,25 +24,25 @@
 
   <!-- Begin Jekyll SEO tag v2.7.1 -->
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="WinMemFopen: opening memory streams as regular files in Windows" />
+<meta property="og:title" content="reading out of a sandbox: a CTF adventure" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Opening memory streams as regular files on Windows" />
-<meta property="og:description" content="Opening memory streams as regular files on Windows" />
-<link rel="canonical" href="https://roberahaile.github.io/posts/winmemfopen-a-tool-for-windows/" />
-<meta property="og:url" content="https://roberahaile.github.io/posts/winmemfopen-a-tool-for-windows/" />
+<meta name="description" content="In this blog post, I’ll go through the writeup of how I and my good friend @RobHaii solved an interesting CTF challenge presented by NahamCon 2020. It was a simple implementation of a system call sandbox, and the solution was to bypass the sandbox by using already whitelisted system calls." />
+<meta property="og:description" content="In this blog post, I’ll go through the writeup of how I and my good friend @RobHaii solved an interesting CTF challenge presented by NahamCon 2020. It was a simple implementation of a system call sandbox, and the solution was to bypass the sandbox by using already whitelisted system calls." />
+<link rel="canonical" href="https://roberahaile.github.io/posts/reading-out-of-a-sandbox-a-CTF-adventure/" />
+<meta property="og:url" content="https://roberahaile.github.io/posts/reading-out-of-a-sandbox-a-CTF-adventure/" />
 <meta property="og:site_name" content="Houldini InfoSec Blog" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2021-06-12T18:02:41+03:00" />
+<meta property="article:published_time" content="2021-08-25T13:20:21+03:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="WinMemFopen: opening memory streams as regular files in Windows" />
+<meta property="twitter:title" content="reading out of a sandbox: a CTF adventure" />
 <meta name="twitter:site" content="@roberahaile__" />
 <meta name="google-site-verification" content="google_meta_tag_verification" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","description":"Opening memory streams as regular files on Windows","headline":"WinMemFopen: opening memory streams as regular files in Windows","dateModified":"2021-06-12T18:02:41+03:00","datePublished":"2021-06-12T18:02:41+03:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://roberahaile.github.io/posts/winmemfopen-a-tool-for-windows/"},"url":"https://roberahaile.github.io/posts/winmemfopen-a-tool-for-windows/","@context":"https://schema.org"}</script>
+{"@type":"BlogPosting","description":"In this blog post, I’ll go through the writeup of how I and my good friend @RobHaii solved an interesting CTF challenge presented by NahamCon 2020. It was a simple implementation of a system call sandbox, and the solution was to bypass the sandbox by using already whitelisted system calls.","headline":"reading out of a sandbox: a CTF adventure","dateModified":"2021-08-25T13:20:21+03:00","datePublished":"2021-08-25T13:20:21+03:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://roberahaile.github.io/posts/reading-out-of-a-sandbox-a-CTF-adventure/"},"url":"https://roberahaile.github.io/posts/reading-out-of-a-sandbox-a-CTF-adventure/","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
-  <title>WinMemFopen: opening memory streams as regular files in Windows | Houldini InfoSec Blog
+  <title>reading out of a sandbox: a CTF adventure | Houldini InfoSec Blog
   </title>
 
   <!--
@@ -404,7 +404,7 @@
       
 
         
-          <span>WinMemFopen: opening memory streams as regular files in Windows</span>
+          <span>reading out of a sandbox: a CTF adventure</span>
 
         
 
@@ -479,7 +479,7 @@
 
     <div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4">
 
-      <h1 data-toc-skip>WinMemFopen: opening memory streams as regular files in Windows</h1>
+      <h1 data-toc-skip>reading out of a sandbox: a CTF adventure</h1>
 
       <div class="post-meta text-muted d-flex flex-column">
         <!-- Published date and author -->
@@ -500,7 +500,7 @@
   
     data-toggle="tooltip"
     data-placement="bottom"
-    title="Sat, Jun 12, 2021,  6:02 PM +0300"
+    title="Wed, Aug 25, 2021,  1:20 PM +0300"
   
 
   
@@ -510,10 +510,10 @@
   
 
   
-    Jun 12
+    Aug 25
   
 
-  <i class="unloaded">2021-06-12T18:02:41+03:00</i>
+  <i class="unloaded">2021-08-25T13:20:21+03:00</i>
 
 </span>
 
@@ -522,14 +522,17 @@
           <div class="post-tags">
             <i class="fa fa-tags fa-fw mr-1"></i>
             
-            <a href="/tags/red-teaming/"
-              class="post-tag no-text-decoration" >Red teaming</a>
+            <a href="/tags/pwn/"
+              class="post-tag no-text-decoration" >pwn</a>
             
-            <a href="/tags/programming/"
-              class="post-tag no-text-decoration" >programming</a>
+            <a href="/tags/linux/"
+              class="post-tag no-text-decoration" >Linux</a>
             
-            <a href="/tags/evasion/"
-              class="post-tag no-text-decoration" >evasion</a>
+            <a href="/tags/syscalls/"
+              class="post-tag no-text-decoration" >syscalls</a>
+            
+            <a href="/tags/sandbox/"
+              class="post-tag no-text-decoration" >sandbox</a>
             
             </div>
           
@@ -554,7 +557,7 @@
 
 
 <!-- return element -->
-<span class="readtime" data-toggle="tooltip" data-placement="bottom" title="1039 words">5 min</span>
+<span class="readtime" data-toggle="tooltip" data-placement="bottom" title="1920 words">10 min</span>
 
 
           <!-- page views -->
@@ -568,117 +571,165 @@
 
         
 
-        <h2 id="opening-memory-streams-as-regular-files-on-windows">Opening memory streams as regular files on Windows</h2>
+        <p>In this blog post, I’ll go through the writeup of how I and my good friend <a href="https://twitter.com/RobHaii">@RobHaii</a> solved an interesting CTF challenge presented by NahamCon 2020. It was a simple implementation of a system call sandbox, and the solution was to bypass the sandbox by using already whitelisted system calls.</p>
 
-<p>One of my personal projects at a point was developing fully undetectable (FUD) malware in Windows environments. Now, there are a lot of elements and components we have to work on to make our implants FUD, but they are out of scope of this blog. Here, I’m going to focus on one component of remaining under the radar - reducing (eliminating) touching the disk.</p>
+<h2 id="what-are-system-calls">What are system calls?</h2>
+<p>System calls are kernel sub-routines which allow user-space programs to request a specific service on behalf of the kernel such as network and file I/O, process creation and so on. Whenever a program calls <em>open()</em>, <em>read()</em>, <em>write()</em> or any other library function, an underlying system call is invoked, with the exception of <a href="https://man7.org/linux/man-pages/man7/vdso.7.html">virtual system calls</a>.</p>
 
-<p>The more our malware implant touches the victim’s disk such as creating files and dropping other executables, the higher chance of it getting detected by EDRs and AVs, since it leaves digital footprints. One way to workaround this to resort to operating in memory. Examples include loading an encrypted configuration file to memory and decypting it, accepting payloads (modules) from our C2 server, and loading them on the fly in memory, and others. One might even think about developing a memory-only filesystem for our malware.</p>
+<p>Most system calls are abstracted away from the programmer by glibc wrappers, although some of them have to be called directly (such as <em>futex()</em>). Without getting into too much details, whenever a system call is invoked, a context switch is made from the user space to kernel space by either using a legacy software interrupt, or newer fast system call methods, such as <em>sysenter()</em> and <em>syscall()</em> for 32 and 64bit systems.</p>
 
-<p>So my project set out to do just that - a way to use arbitrary memory buffers as regular files, perform file I/O operations on them such as open, close, read, write and seek. To achieve this, we need to open the memory as a file stream, and have APIs which can operate on the opened file stream. This is easy in Linux, as Linux has an API called <a href="http://man7.org/linux/man-pages/man3/fmemopen.3.html">fmemopen()</a>. Another API is <a href="https://man7.org/linux/man-pages/man3/open_memstream.3.html">open_memstream()</a>, which opens a stream for writing to a dynamically allocated memory buffer.</p>
+<p>A very good explanation of Linux system calls internals is found <a href="https://packagecloud.io/blog/the-definitive-guide-to-linux-system-calls/">here</a>.</p>
 
-<p>I researched the equivalent of these two functions in Windows, and I couldn’t find any suitable API. So, I thought the next step would be to implement the functions by ourselves. But this would be unnecessarily complicated (although interesting).</p>
+<h2 id="what-about-sandboxes">What about sandboxes?</h2>
+<p>A sandbox is a security mechanism which restricts a process to a set of whitelisted actions it can perform. Although sanbox implemenations are popularized by web browsers, they are deployed in other contexts such as anti-viruses, PDF readers, mobile apps, containers and such. Even virtual machines can be considered as sandboxes where the host machine is protected from malicious actions happening in the VM. Sandboxes provide additional security protection because they restrict processes regardless of other access control mechanisms such as user IDs and permissions.</p>
 
-<p>After some more digging in the Microsoft docs, I found this gem, <a href="https://docs.microsoft.com/en-us/windows/win32/multimedia/performing-memory-file-i-o">Performing memory file I/0</a>. This is an excerpt from the page.</p>
+<p>Userspace applications can be restricted to certain system calls in modern operating systems by mechanisms such as <a href="https://man7.org/linux/man-pages/man2/seccomp.2.html">seccomp</a> in Linux and <a href="https://man.openbsd.org/pledge.2">pledge</a> in OpenBSD.</p>
 
-<blockquote>
-  <p>The multimedia file I/O services let you treat a block of memory as a file. This can be useful if you already have a file image in memory. Memory files let you reduce the number of special-case conditions in your code because, for I/O purposes, you can treat memory files as if they were disk-based files.</p>
-</blockquote>
+<h2 id="sytem-call-as-a-service">Sytem call-as-a-Service</h2>
+<p>The aptly named challenge required the player to connect to a service which invokes the CTF binary. Upon donwloading and inspecting the binary, it turned out to be a 64bit ELF unstripped executable with debug symbols. Loading the executable in IDA pro disassembler and decompiling main results in the following pseudo-code.</p>
+<h3 id="main">main()</h3>
 
-<p>Let’s get to the I/O functions and use them.</p>
+<pre><code class="language-C">int __cdecl __noreturn main(int argc, const char **argv, const char **envp)
+{
+  __int64 sysno; // [rsp+8h] [rbp-48h] BYREF
+  __int64 v4; // [rsp+10h] [rbp-40h] BYREF
+  __int64 v5; // [rsp+18h] [rbp-38h] BYREF
+  __int64 v6; // [rsp+20h] [rbp-30h] BYREF
+  __int64 v7; // [rsp+28h] [rbp-28h] BYREF
+  __int64 v8; // [rsp+30h] [rbp-20h] BYREF
+  __int64 v9; // [rsp+38h] [rbp-18h] BYREF
+  __int64 v10; // [rsp+40h] [rbp-10h]
+  unsigned __int64 v11; // [rsp+48h] [rbp-8h]
 
-<p>To open a memory buffer as a file, we use the API <a href="https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioopen">mmioOpen()</a>. It can open standard files, memory buffer, or components of a custom storage system. Let’s see the definition for mmioOpen.</p>
-
-<pre><code class="language-C">HMMIO mmioOpen(
-  LPSTR      pszFileName,
-  LPMMIOINFO pmmioinfo,
-  DWORD      fdwOpen
-);
+  v11 = __readfsqword(0x28u);
+  setup(argc, argv, envp);
+  puts("Welcome to syscall-as-a-service!\n");
+  while ( 1 )
+  {
+    printf("Enter rax (decimal): ");
+    __isoc99_scanf("%ld", &amp;sysno);
+    if ( (unsigned int)blacklist(sysno) )
+    {
+      puts("Sorry syscall is blacklisted\n");
+    }
+    else
+    {
+      printf("Enter rdi (decimal): ");
+      __isoc99_scanf("%ld", &amp;v4);
+      printf("Enter rsi (decimal): ");
+      __isoc99_scanf("%ld", &amp;v5);
+      printf("Enter rdx (decimal): ");
+      __isoc99_scanf("%ld", &amp;v6);
+      printf("Enter r10 (decimal): ");
+      __isoc99_scanf("%ld", &amp;v7);
+      printf("Enter r9 (decimal): ");
+      __isoc99_scanf("%ld", &amp;v8);
+      printf("Enter r8 (decimal): ");
+      __isoc99_scanf("%ld", &amp;v9);
+      v10 = syscall(sysno, v4, v5, v6, v7, v9, v8);
+      printf("Rax: 0x%lx\n\n", v10);
+    }
+  }
+}
 </code></pre>
 
-<p>It accepts a pointer to C-style string called <em>pszFilename</em>, a pointer to <a href="https://docs.microsoft.com/en-us/previous-versions//dd757322(v=vs.85)">MMIOINFO</a> structure, and a flag. We will make <em>psZFilename</em> NULL (because we don’t have a filename). Coming to MMIOINFO structure, we have to set some members of the structure. Here is the definition of the structure.</p>
+<p>After printing its greeting message, it goes into an infinite loop, where it reads seven long integers from the network and puts them in separate variables. It then checks the first read number (put in a variable called <em>sysno</em>) and gives it to a function called <em>blacklist()</em>, and finally based on the return value from the <em>blacklist()</em> calls, it either calls a function <em>syscall()</em> with our data-holding variables or fails with an error message.</p>
 
-<pre><code class="language-C">typedef struct {
-  DWORD      dwFlags;
-  FOURCC     fccIOProc;
-  LPMMIOPROC pIOProc;
-  UINT       wErrorRet;
-  HTASK      hTask;
-  LONG       cchBuffer;
-  HPSTR      pchBuffer;
-  HPSTR      pchNext;
-  HPSTR      pchEndRead;
-  HPSTR      pchEndWrite;
-  LONG       lBufOffset;
-  LONG       lDiskOffset;
-  DWORD      adwInfo[4];
-  DWORD      dwReserved1;
-  DWORD      dwReserved2;
-  HMMIO      hmmio;
-} MMIOINFO;
+<h2 id="syscall-numbers-and-calling-conventions">Syscall numbers and calling conventions</h2>
+<p>We will come to the above function later. Before that, let’s talk a little about calling conventions. Calling conventions are conventions which specify called code interfaces, such as the order of parameters passed to the callee, how parameters are passed (either by pushing on the stack or by registers or both), how return values are returned to the caller, which registers the called code must preserve for the caller code, and how stack is prepared and restored before and after the call. Calling conventions vary across different processor architectures, across different compilers in the same architecture, and even between usermode and kernel interfaces.</p>
+
+<p>Coming to the challenge, after recieving the long integers from the user, it makes a call to <a href="https://man7.org/linux/man-pages/man2/syscall.2.html"><em>syscall()</em></a>. <em>syscall()</em> is a small library function which invokes system calls by using the appropriate system calls number. It is useful to invoke system calls which do not have glibc wrappers. Its declaration is:</p>
+<pre><code class="language-C">long syscall(long number, ...);
+</code></pre>
+<p>It accepts a syscall number, and variable number of arguments, and returns a <em>long</em> value from the call. The variable arguments are passed to the called system call as parameters. Every system call has a unique syscall number which can be passed to <em>syscall()</em>. A system call can, and usually has different syscall number for various architectures. The list of system calls with their syscall numbers across different architectures can be found <a href="https://syscalls.w3challs.com/">here</a>.</p>
+
+<p>Bringing back calling conventions, the kernel interface of X86_64 Linux compilers states that parameters are passed by <strong>RDI, RSI, RDX, R10, R8 and R9</strong> in order to system calls. For example, the <a href="https://man7.org/linux/man-pages/man2/write.2.html"><em>write()</em></a> system call has a unique syscall number of 1 in X86_64 and the following parameters.</p>
+<pre><code class="language-C">ssize_t write(int fd, const void *buf, size_t count);
+</code></pre>
+<p>Therefore, <em>fd</em> parameter will be passed by <em>RDI</em>; <em>buf</em> will be passed by <em>RSI</em>; <em>count</em> will be passed by <em>RDX</em>. <em>R10</em>, <em>R8</em> and <em>R9</em> will be set to zero.</p>
+
+<p>Thus, when invoking <em>write()</em> by using <em>syscall()</em>, it will be like this:</p>
+<pre><code class="language-C">syscall(1, %RDI, %RSI, %RDX)
 </code></pre>
 
-<p>The relevant members are <em>fccIOProc</em>, <em>cchBuffer</em>, <em>pchBuffer</em>, <em>adwInfo</em>. <em>fccIOProc</em> is a four-character which identifies the file’s I/O operation. We set this to <strong>FOURCC_MEM</strong>.</p>
+<h2 id="the-sandbox">The sandbox</h2>
+<p>Knowing this, the <a href="#main">SaaS binary</a> makes more sense now. It accepts a syscall number and puts it in <em>sysno</em>, accepts upto 6 arguments for the system call,  and calls <em>syscall()</em>, and returns the return value of the system call back to us. But before the invocation, it calls <em>blacklist()</em> with <em>sysno</em> as a parameter, and based on the return value, it succeeds to invoke our system call or fails with the message “Sorry syscall is blacklisted”. Let’s see the blacklisting function.</p>
+<pre><code class="language-C">__int64 __fastcall blacklist(__int64 a1)
+{
+  unsigned int i; // [rsp+1Ch] [rbp-44h]
+  __int64 v3[8]; // [rsp+20h] [rbp-40h]
 
-<p><em>pchBuffer</em> is the memory block to be opened as a file. We have to set this to an already allocated memory block. To request that the file I/O manager allocate the memory block, we can set pchBuffer to NULL.</p>
+  v3[7] = __readfsqword(0x28u);
+  v3[0] = 59LL;
+  v3[1] = 57LL;
+  v3[2] = 56LL;
+  v3[3] = 62LL;
+  v3[4] = 101LL;
+  v3[5] = 200LL;
+  v3[6] = 322LL;
+  for ( i = 0; i &lt;= 6; ++i )
+  {
+    if ( a1 == v3[i] )
+      return 1LL;
+  }
+  return 0LL;
+}
+</code></pre>
+<p>It compares our syscall number to a list of blacklisted numbers, and it matches, it will return 1. The syscall numbers listed correspond to <a href="https://man7.org/linux/man-pages/man2/execve.2.html">execve()</a>, <a href="https://man7.org/linux/man-pages/man2/fork.2.html">fork()</a>, <a href="https://man7.org/linux/man-pages/man2/clone.2.html">clone()</a>, <a href="https://man7.org/linux/man-pages/man2/kill.2.html">kill()</a>, <a href="https://man7.org/linux/man-pages/man2/ptrace.2.html">ptrace()</a>, <a href="https://man7.org/linux/man-pages/man2/tkill.2.html">tkill()</a>, and <a href="https://man7.org/linux/man-pages/man2/timerfd_create.2.html">timerfd_create()</a>(32bit). These system calls are associated with process and thread cloning, execution of images, killing processes and threads, and timer notification. Therefore, we can’t do anything related to these tasks through the SaaS because of the blacklisting function.</p>
 
-<p><em>cchBuffer</em> is the initial size of the memory block (<em>pchBuffer</em>).</p>
+<h2 id="exploitation">Exploitation</h2>
 
-<p><em>adwInfo</em> is state information maintained by the I/O procedure. Just set this to NULL.</p>
+<p>The plan is to read the file <em>flag.txt</em>. Since, we can’t execute commands such as <em>/bin/sh -c ‘cat flat.txt’</em> using system calls such as exec and fork. so, we will use other system calls to open the file, read its contents and and send it back to us using allowed system calls.</p>
 
-<p>We set the rest of the members of the structure to zero.</p>
+<p>The first thing to do, therefore, would be to open the file. Searching for the man pages for system calls for opening files (or searching google) will lead us to use <em><a href="https://man7.org/linux/man-pages/man2/openat.2.html">open()</a></em>. open() system call is declared as such.</p>
+<pre><code class="language-C">int open(const char *pathname, int flags);
+</code></pre>
+<p>So, we have to provide <em>pathname</em>, in our case <em>flag.txt</em> as a pointer to C string. But we don’t have a pointer to “flag.txt”, so we have to manually write it into a controlled memory region and pass the address of that region to open().</p>
 
-<p>Now that we have created our structure and initialized the right members for memory block operations, we can pass it to <em>mmioOpen()</em>. The third flag of <em>mmioOpen()</em> is <em>fdwOpen</em>, which is a flag for open operation. we can set the flag to <strong>MMIO_READWRITE</strong>.</p>
+<p>After googling about linux system calls to allocate a memory region, we will come up with <em><a href="https://man7.org/linux/man-pages/man2/mmap.2.html">mmap()</a></em>. The parameters and return value of mmap() is as belows.</p>
+<pre><code class="language-C">void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
+</code></pre>
+<p>mmap() creates  a  new  mapping  in the virtual address space of the calling process. It accepts a size paramter by <em>length</em>, and starting memory address to map by <em>addr</em>. If <em>addr</em> is null, the kernel will choose a page-alligned memory region randomly. The <em>prot</em> parameter is the protection flags. For our case, we will choose (PROT_READ|PROT_WRITE) which is 0x3. The <em>flags</em> is mapping flags, and we will select (MAP_PRIVATE|MAP_ANONYMOUS). <em>MAP_ANONYMOUS</em> will ensure that the mapping is not backed up by an underlying file, and the contents are initialized to zeroes. The system call returns the address of the mapped memory region.</p>
 
-<p><em>mmioOpen()</em> returns a <em>HMMIO</em> file handle. Note that this file handle is not a standard file handle, and we should not use it with other file I/O functions other than multimedia file I/O APIs. The function returns NULL if there is an error, and <em>wErrorRet</em> member of MMIO structure passed to it will contain the error code (listed on <em>mmioOpen()</em> docs).</p>
+<p>After getting our mapped memory region which is initialized to all zeros, we want to write our “flag.txt” string to it. This step will be reading our string from our socket file descriptor into our newly mapped memory buffer. A system call for this would be <em><a href="https://man7.org/linux/man-pages/man2/read.2.html">read()</a></em>. The parameters and the return value of read() is as follows.</p>
+<pre><code class="language-C">ssize_t read(int fd, void *buf, size_t count);
+</code></pre>
+<p>So, to use read(), we have to pass the file descriptor <em>fd</em> of the our connection socket, and pass the address returned from mmap() as <em>buf</em>, and the length of <em>flag.txt</em> (8) as <em>count</em>. Assuming the server which spawns the SaaS binary also duplicates the STDIN, STDOUT and STDERR file descriptors to our socket (read <a href="https://man7.org/linux/man-pages/man2/dup.2.html">dup2()</a>), we will use STDIN (0) as input from the socket as a paramter as <em>fd</em> to read().</p>
 
-<p>Note: files (memory blocks) opened by this function are not automatically closed when our application exits; therefore, we must call <em>mmioClose()</em> to close the file handle.</p>
+<p>We then pass our mapped address, which now contains the string “flag.txt” to open() as <em>pathname</em> (it is null-terminated since address is initialized with zeros).</p>
 
-<p>The next function we are going to use is <a href="https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioread">mmioRead()</a>. Here is how it is defined.</p>
-
-<pre><code class="language-C">LONG mmioRead(
-  HMMIO hmmio,
-  HPSTR pch,
-  LONG  cch
-);
+<p>so far, our pseudo-C code for our solution will look like this.</p>
+<pre><code class="language-C">void *address = mmap(NULL, 128, (PROT_READ|PROT_WRITE), (MAP_PRIVATE|MAP_ANONYMOUS), NULL, 0); 
+read(STDIN, address, len("flag.txt")); 
+int file_fd = open(address, O_RDONLY)
 </code></pre>
 
-<p>It accepts the HMMIO file handle returned from <em>mmioOpen()</em>, a pointer to buffer to read into (<em>pch</em>), and the number of bytes to read (<em>cch</em>). On success, it returns the number of bytes read, zero if we have reached the end of file or no more bytes can be read, and -1 on error.</p>
-
-<p>The third function is <a href="https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmiowrite">mmioWrite()</a>. Here is the definition.</p>
-
-<pre><code class="language-C">LONG mmioWrite(
-  HMMIO            hmmio,
-  const char _huge *pch,
-  LONG             cch
-);
+<p>Now that we have opened the file and gotten a file descriptor, we will read the contents of the the file to a buffer, and write the read contents from the buffer to our socket. The first part is easy; we will use read() again with <em>fd</em> parameter as the file descriptor returned from the previous open() call, and the same buffer with a slight offset (not to write on the previously written “flag.txt” file name.). Our code will have one more line.</p>
+<pre><code class="language-C">int read_bytes = read(file_fd, address + 20, 128); 
+</code></pre>
+<p>Then we will write the contents read from the previous read() call and write it to our socket (STDOUT, using our previous assumption that standard file descriptors are duplicated). Here, we will use <em><a href="https://man7.org/linux/man-pages/man2/write.2.html">write()</a></em>.</p>
+<pre><code class="language-C">write(STDOUT, address + 20, read_bytes); 
+</code></pre>
+<p>Our final payload will look like this.</p>
+<pre><code class="language-C">void *address = mmap(NULL, 128, (PROT_READ|PROT_WRITE), (MAP_PRIVATE|MAP_ANONYMOUS), NULL, 0); 
+read(STDIN, address, len("flag.txt")); 
+int file_fd = open(address, O_RDONLY); 
+int read_bytes = read(file_fd, address + 20, 128);
+write(STDOUT, address + 20, read_bytes); 
 </code></pre>
 
-<p>It is literally the opposite twin of <em>mmioRead()</em>. It returns the number of bytes written, or -1 if there was an error.</p>
-
-<p>The fourth function is <a href="https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioseek">mmioSeek()</a> which is used to change the file position to a custom offset.</p>
-
-<pre><code class="language-C">LONG mmioSeek(
-  HMMIO hmmio,
-  LONG  lOffset,
-  int   iOrigin
-);
+<p>Translating this C code to <em>syscall()</em> with respective syscall numbers and parameters will be like this.</p>
+<pre><code class="language-C">address = syscall(9, 0, 128, 3, 34, 0, 0, 0);                     //mmap() 
+syscall(0, 0, address, 9, 0, 0, 0);                               //read() 
+fild_fd = syscall(2, address, 0, 0, 0, 0, 0);                     //open() 
+read_bytes = syscall(0, file_fd, address + 20, 128, 0, 0, 0, 0);  //read() 
+syscall(1, 1, address + 20, read_bytes, 0, 0, 0, 0);              //write() 
 </code></pre>
 
-<p>Aside from HMMIO file handle, it takes lOffset (offset to change the file position), and iOrigin, which specifies how the offset specified by <em>lOffset</em> is interpreted. <strong>SEEK_CUR</strong> seeks to <em>lOffset</em> bytes from the current file position; <strong>SEEK_END</strong> seeks to <em>lOffset</em> bytes from the end of the file; <strong>SEEK_SET</strong> seeks to <em>lOffset</em> bytes from the beginning of the file.</p>
+<p>Finally, we shall get our flag after the final system call (write())!. What’s left is to implement the above C code in python using <a href="https://github.com/Gallopsled/pwntools">pwntools</a> and send the appropriate parameters to <em>syscall()</em> via registers for <a href="#main">the SaaS</a>.</p>
 
-<p>NOTE: Seeking to an invalid location in the file, such as past the end of the file, might not cause mmioSeek() to return an error, but it might cause subsequent I/O operations on the file to fail. So, we have to implement our own check so that it doesn’t happen.</p>
+<p>All in all, this was a very interesting and a fun challenge about a crude implementation of a system call sandbox and how to bypass it. The SaaS binary and the solution python script can be found <a href="https://github.com/RoberaHaile/ctf-solutions/tree/master/NahamCon-2020/SaaS">here</a>.</p>
 
-<p>And finally, <a href="https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/nf-mmiscapi-mmioclose">mmioClose()</a> closes the HMMIO file handle we opened earlier.</p>
-
-<pre><code class="language-C">MMRESULT mmioClose(
-  HMMIO hmmio,
-  UINT  fuClose
-);
-</code></pre>
-
-<p>There are other cool functions other than these, such as <em>mmioInstallIOProc()</em> and <em>MMIOProc()</em>, but I’ll leave that as an interesting detour to the curious reader.</p>
-
-<p>I have written a wrapper library around these functions, along with a silly demonstration example <a href="https://github.com/RoberaHaile/WinMemFopen">here</a>.</p>
 
 
       </div>
@@ -704,13 +755,13 @@
 
     
       
-        <a href="https://twitter.com/intent/tweet?text=WinMemFopen: opening memory streams as regular files in Windows - Houldini InfoSec Blog&url=https://roberahaile.github.io/posts/winmemfopen-a-tool-for-windows/" data-toggle="tooltip" data-placement="top"
+        <a href="https://twitter.com/intent/tweet?text=reading out of a sandbox: a CTF adventure - Houldini InfoSec Blog&url=https://roberahaile.github.io/posts/reading-out-of-a-sandbox-a-CTF-adventure/" data-toggle="tooltip" data-placement="top"
           title="Twitter" target="_blank" rel="noopener" aria-label="Twitter">
           <i class="fa-fw fab fa-twitter"></i>
         </a>
     
       
-        <a href="https://telegram.me/share?text=WinMemFopen: opening memory streams as regular files in Windows - Houldini InfoSec Blog&url=https://roberahaile.github.io/posts/winmemfopen-a-tool-for-windows/" data-toggle="tooltip" data-placement="top"
+        <a href="https://telegram.me/share?text=reading out of a sandbox: a CTF adventure - Houldini InfoSec Blog&url=https://roberahaile.github.io/posts/reading-out-of-a-sandbox-a-CTF-adventure/" data-toggle="tooltip" data-placement="top"
           title="Telegram" target="_blank" rel="noopener" aria-label="Telegram">
           <i class="fa-fw fab fa-telegram"></i>
         </a>
@@ -1064,20 +1115,20 @@
   
 
   
-
-  
-
-  
-
-  
-
-  
-
-
-  
-
-  
     
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
 
 
 
@@ -1092,15 +1143,15 @@
   
     
     
-      
-      
-        
-        
-        
-      
-    
   
     
+    
+      
+      
+        
+        
+        
+      
     
   
 
@@ -1116,7 +1167,7 @@
       
       
       <div class="card">
-        <a href="/posts/reading-out-of-a-sandbox-a-CTF-adventure/">
+        <a href="/posts/winmemfopen-a-tool-for-windows/">
           <div class="card-body">
             <!--
   Date format snippet
@@ -1137,14 +1188,14 @@
   
 
   
-    Aug 25
+    Jun 12
   
 
-  <i class="unloaded">2021-08-25T13:20:21+03:00</i>
+  <i class="unloaded">2021-06-12T18:02:41+03:00</i>
 
 </span>
 
-            <h3 class="pt-0 mt-1 mb-3" data-toc-skip>reading out of a sandbox: a CTF adventure</h3>
+            <h3 class="pt-0 mt-1 mb-3" data-toc-skip>WinMemFopen: opening memory streams as regular files in Windows</h3>
             <div class="text-muted small">
               <p>
                 
@@ -1153,7 +1204,9 @@
 
 
 
-                In this blog post, I’ll go through the writeup of how I and my good friend @RobHaii solved an interesting CTF challenge presented by NahamCon 2020. It was a simple implementation of a system call s...
+                Opening memory streams as regular files on Windows
+
+One of my personal projects at a point was developing fully undetectable (FUD) malware in Windows environments. Now, there are a lot of elements ...
               </p>
             </div>
           </div>
@@ -1171,17 +1224,17 @@
 
 <div class="post-navigation d-flex justify-content-between">
   
-  <span class="btn btn-outline-primary disabled"
+  <a href="/posts/winmemfopen-a-tool-for-windows/" class="btn btn-outline-primary"
     prompt="Older">
-    <p>-</p>
-  </span>
+    <p>WinMemFopen: opening memory streams as regular files in Windows</p>
+  </a>
   
 
   
-  <a href="/posts/reading-out-of-a-sandbox-a-CTF-adventure/" class="btn btn-outline-primary"
+  <span class="btn btn-outline-primary disabled"
     prompt="Newer">
-    <p>reading out of a sandbox: a CTF adventure</p>
-  </a>
+    <p>-</p>
+  </span>
   
 
 </div>

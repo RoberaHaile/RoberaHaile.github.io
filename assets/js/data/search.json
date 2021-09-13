@@ -1,6 +1,21 @@
 [
   
   {
+    "title": "reading out of a sandbox: a CTF adventure",
+    "url": "/posts/reading-out-of-a-sandbox-a-CTF-adventure/",
+    "categories": "",
+    "tags": "pwn, Linux, syscalls, sandbox",
+    "date": "2021-08-25 13:20:21 +0300",
+    
+
+
+
+
+
+    "snippet": "In this blog post, I’ll go through the writeup of how I and my good friend @RobHaii solved an interesting CTF challenge presented by NahamCon 2020. It was a simple implementation of a system call sandbox, and the solution was to bypass the sandbox by using already whitelisted system calls.What ar..."
+  },
+  
+  {
     "title": "WinMemFopen: opening memory streams as regular files in Windows",
     "url": "/posts/winmemfopen-a-tool-for-windows/",
     "categories": "",
