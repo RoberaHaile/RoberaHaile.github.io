@@ -1,7 +1,7 @@
 [
   
   {
-    "title": "reading out of a sandbox: a CTF adventure",
+    "title": "Reading out of a sandbox: a CTF adventure",
     "url": "/posts/reading-out-of-a-sandbox-a-CTF-adventure/",
     "categories": "",
     "tags": "pwn, Linux, syscalls, sandbox",
